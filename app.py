@@ -19,6 +19,7 @@ def register():
 
 
 
+
 ## 登录
 @app.route('/login/',methods=['GET','POST'])
 def login():
