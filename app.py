@@ -52,8 +52,6 @@ def register():
     return "Finish！"
 
 
-
-
 ## 登录
 @app.route('/login/',methods=['GET','POST'])
 def login():
@@ -113,6 +111,33 @@ def forget():
             print('You input nothing correct!')
     return 'Finish'
 
+@app.route('/operator-hubdetails/',methods=['GET','POST'])
+def operator_hubdetails():
+    if request.method == 'POST':
+        json = request.get_json()
+        hub_name = json['hub_name']
+        sql1 = "SELECT car_id, model_id, brand, seat, price FROM vehicle WHERE hub_id = (SELECT hub_id FROM hub WHERE hub_name='{}' or coordinate='{}')".format(hub_name, hub_name)
+        result1 = db.session.execute(sql1)
+        dataframe1 = pd.DataFrame(result1)
+        dataframe1_json = dataframe1.to_json(orient="index",force_ascii=False)
+
+        sql2 = "SELECT car_id, model_id, brand, seat, price FROM vehicle WHERE hub_id = (SELECT hub_id FROM hub WHERE hub_name='{}' or coordinate='{}') and status=0".format(hub_name, hub_name)
+        result2 = db.session.execute(sql2)
+        dataframe2 = pd.DataFrame(result2)
+        dataframe2_json = dataframe2.to_json(orient="index", force_ascii=False)
+
+        sql3 = "SELECT car_id, model_id, brand, seat, price FROM vehicle WHERE hub_id = (SELECT hub_id FROM hub WHERE hub_name='{}' or coordinate='{}') and status=1".format(
+            hub_name, hub_name)
+        result3 = db.session.execute(sql3)
+        dataframe3 = pd.DataFrame(result3)
+        dataframe3_json = dataframe3.to_json(orient="index", force_ascii=False)
+
+        sql4 = "SELECT car_id, model_id, brand, seat, price FROM vehicle WHERE hub_id = (SELECT hub_id FROM hub WHERE hub_name='{}' or coordinate='{}') and status=2".format(
+            hub_name, hub_name)
+        result4 = db.session.execute(sql4)
+        dataframe4 = pd.DataFrame(result4)
+        dataframe4_json = dataframe4.to_json(orient="index", force_ascii=False)
+    return {'cars_in_hub':dataframe1_json, 'cars_taken':dataframe2_json, 'New cars':dataframe3_json, 'car_need_repair':dataframe4_json}
 
 
 
