@@ -28,16 +28,56 @@ def login():
         email = json['email']
         password = json['password']
         if email!=None and password!=None:
-            sql = "SELECT * FROM customer WHERE email ='%s' and password ='%s'" % (email, password)
-            result = db.session.execute(sql).fetchall()
-            dataframe = pd.DataFrame(result)
-            if dataframe.empty != True:
+            sql1 = "SELECT * FROM customer WHERE email ='%s' and password ='%s'" % (email, password)
+            result1 = db.session.execute(sql1).fetchall()
+            dataframe1 = pd.DataFrame(result1)
+            sql2 = "SELECT * FROM customer WHERE contact ='%s' and password ='%s'" % (email, password)
+            result2 = db.session.execute(sql2).fetchall()
+            dataframe2 = pd.DataFrame(result2)
+            if dataframe1.empty!= True:
+                End = 'login success'
+            elif dataframe2.empty!= True:
                 End = 'login success'
             else:
                 End = 'login failed'
         else:
             End = 'Error'
     return End
+
+@app.route('/forget/',methods=['GET','POST'])
+def forget():
+    if request.method == 'POST':
+        json = request.get_json()
+        email = json['email']
+        vercode = json['vercode']
+        password1 = json['password1']
+        password2 = json['password2']
+        if email != None:
+            sql1 = "SELECT * FROM customer WHERE email ='%s'" % (email)
+            result1 = db.session.execute(sql1).fetchall()
+            dataframe1 = pd.DataFrame(result1)
+            sql2 = "SELECT * FROM customer WHERE contact ='%s'" % (email)
+            result2 = db.session.execute(sql2).fetchall()
+            dataframe2 = pd.DataFrame(result2)
+            if dataframe1.empty!=True or dataframe2.empty!=True:
+                if password1 == password2:
+                    if dataframe1.empty!=True:
+                        password_old = dataframe1.at[0, 'password']
+                        sql3 = "UPDATE customer SET password=REPLACE(password, '%s', '%s') where email ='%s' OR contact ='%s'" % (password_old, password1, email, email)
+                        db.session.execute(sql3)
+                        db.session.commit()
+                    elif dataframe2.empty!=True:
+                        password_old = dataframe2.at[0, 'password']
+                        sql4 = "UPDATE customer SET password=REPLACE(password, '%s', '%s') where email ='%s' OR contact ='%s'" % (password_old, password1, email, email)
+                        db.session.execute(sql4)
+                        db.session.commit()
+                else:
+                    print('The two password is not the same')
+            else:
+                print('No such user!')
+        else:
+            print('You input nothing correct!')
+    return sql4
 
 
 
