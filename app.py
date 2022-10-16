@@ -60,21 +60,34 @@ def login():
         email = json['email']
         password = json['password']
         if email!=None and password!=None:
-            sql1 = "SELECT * FROM customer WHERE email ='%s' and password ='%s'" % (email, password)
+            sql1 = "SELECT type FROM customer WHERE email ='%s' and password ='%s'" % (email, password)
             result1 = db.session.execute(sql1).fetchall()
             dataframe1 = pd.DataFrame(result1)
-            sql2 = "SELECT * FROM customer WHERE contact ='%s' and password ='%s'" % (email, password)
+            sql2 = "SELECT type FROM customer WHERE contact ='%s' and password ='%s'" % (email, password)
             result2 = db.session.execute(sql2).fetchall()
             dataframe2 = pd.DataFrame(result2)
             if dataframe1.empty!= True:
-                End = 'login success'
+                type = dataframe1.at[0, 'type']
+                if type==0:
+                    End='customer'
+                elif type==1:
+                    End='operator'
+                elif type==2:
+                    End='manager'
             elif dataframe2.empty!= True:
-                End = 'login success'
+                type = dataframe2.at[0, 'type']
+                if type == 0:
+                    End='customer'
+                elif type == 1:
+                    End='operator'
+                elif type == 2:
+                    End='manager'
             else:
-                End = 'login failed'
+                End='login failed'
         else:
-            End = 'Error'
+            End='Error'
     return End
+
 
 @app.route('/forget/',methods=['GET','POST'])
 def forget():
@@ -138,6 +151,15 @@ def operator_hubdetails():
         dataframe4 = pd.DataFrame(result4)
         dataframe4_json = dataframe4.to_json(orient="index", force_ascii=False)
     return {'cars_in_hub':dataframe1_json, 'cars_taken':dataframe2_json, 'New cars':dataframe3_json, 'car_need_repair':dataframe4_json}
+
+
+@app.route('/operator-movevehicles/',methods=['GET','POST'])
+def operator_movevehicles():
+    if request.method == 'POST':
+        json = request.get_json()
+
+
+    return 'Finish!'
 
 
 
