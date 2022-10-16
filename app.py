@@ -28,7 +28,6 @@ def register():
         last_name = json['last_name']
         driver_no = json['driver_no']
         expiry_date = json['expiry_date']
-        # expiry_date = (datetime.strptime(expiry_date, '%Y/%m/%d')).date()
         contact = json['contact']
         emergency_name = json['emergency_name']
         emergency_contact = json['emergency_contact']
@@ -153,11 +152,35 @@ def operator_hubdetails():
     return {'cars_in_hub':dataframe1_json, 'cars_taken':dataframe2_json, 'New cars':dataframe3_json, 'car_need_repair':dataframe4_json}
 
 
-@app.route('/operator-movevehicles/',methods=['GET','POST'])
-def operator_movevehicles():
+@app.route('/user_profileediting/',methods=['GET','POST'])
+def user_profileediting():
     if request.method == 'POST':
         json = request.get_json()
-
+        email = json['email']
+        password = json['password']
+        type = json['type']
+        name = json['name']
+        last_name = json['last_name']
+        driver_no = json['driver_no']
+        expiry_date = json['expiry_date']
+        contact = json['contact']
+        emergency_name = json['emergency_name']
+        emergency_contact = json['emergency_contact']
+        sql1 = "DELETE FROM customer WHERE email='{}' and name='{}'".format(email, name)
+        db.session.execute(sql1)
+        db.session.commit()
+        dataframe = pd.DataFrame()
+        while dataframe.empty:
+            sql1 = "SELECT COUNT(*) FROM customer"
+            result1 = db.session.execute(sql1).fetchall()
+            dataframe = pd.DataFrame(result1)
+            cus_id_num = dataframe.at[0, 'COUNT(*)']
+            cus_id = 'GLA' + str(cus_id_num)
+            sql2 = "INSERT INTO customer(cus_id, email, password, type, name, last_name, driver_no, expiry_date, contact, emergency_name, emergency_contact) VALUES ( '{}', '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
+                cus_id, email, password, type, name, last_name, driver_no, expiry_date, contact, emergency_name,
+                emergency_contact)
+            db.session.execute(sql2)
+            db.session.commit()
 
     return 'Finish!'
 
