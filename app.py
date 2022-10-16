@@ -156,6 +156,7 @@ def operator_hubdetails():
 def user_profileediting():
     if request.method == 'POST':
         json = request.get_json()
+        cus_id = json['cus_id']
         email = json['email']
         password = json['password']
         type = json['type']
@@ -166,7 +167,7 @@ def user_profileediting():
         contact = json['contact']
         emergency_name = json['emergency_name']
         emergency_contact = json['emergency_contact']
-        sql1 = "DELETE FROM customer WHERE email='{}' and name='{}'".format(email, name)
+        sql1 = "DELETE FROM customer WHERE cus_id='{}'".format(cus_id)
         db.session.execute(sql1)
         db.session.commit()
         dataframe = pd.DataFrame()
@@ -175,7 +176,7 @@ def user_profileediting():
             result1 = db.session.execute(sql1).fetchall()
             dataframe = pd.DataFrame(result1)
             cus_id_num = dataframe.at[0, 'COUNT(*)']
-            cus_id = 'GLA' + str(cus_id_num)
+            cus_id = 'GLA' + str(cus_id_num+1)
             sql2 = "INSERT INTO customer(cus_id, email, password, type, name, last_name, driver_no, expiry_date, contact, emergency_name, emergency_contact) VALUES ( '{}', '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(
                 cus_id, email, password, type, name, last_name, driver_no, expiry_date, contact, emergency_name,
                 emergency_contact)
