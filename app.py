@@ -77,9 +77,7 @@ def forget():
                 print('No such user!')
         else:
             print('You input nothing correct!')
-    return sql4
-
-
+    return 'Finish'
 
 
 
