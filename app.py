@@ -305,5 +305,15 @@ def operator_repairvehicles():
         dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
     return dataframe1_json
 
+@app.route('/operator-repairvehicles/repaired/', methods=['POST'])
+def repaired():
+    if request.method == 'POST':
+        json = request.get_json()
+        car_id = json['car_id']
+        sql1 = "UPDATE vehicle SET status=REPLACE(status, {}, {}) where car_id ='{}'".format(2, 1, car_id)
+        db.session.execute(sql1)
+        db.session.commit()
+    return "Success!"
+
 if __name__ == '__main__':
     app.run(debug=True)
