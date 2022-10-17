@@ -252,8 +252,16 @@ def user_return():
 
         return "Finish"
 
-# @app.route('/user-return/', methods=['GET', 'POST'])
-
+@app.route('/operator-movevehicles/show-cars-in-hub/', methods=['GET', 'POST'])
+def operator_movevehicles():
+    if request.method == 'POST':
+        json = request.get_json()
+        hub_name = json['hub_name']
+        sql1 = "SELECT car_id FROM vehicle WHERE hub_id=(SELECT hub_id FROM hub WHERE hub_name='{}')".format(hub_name)
+        result1 = db.session.execute(sql1)
+        dataframe1 = pd.DataFrame(result1)
+        dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
+    return dataframe1_json
 
 
 if __name__ == '__main__':
