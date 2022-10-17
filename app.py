@@ -294,5 +294,16 @@ def operator_repairlist():
         dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
     return dataframe1_json
 
+@app.route('/operator-repairvehicles/', methods=['POST'])
+def operator_repairvehicles():
+    if request.method == 'POST':
+        json = request.get_json()
+        car_id = json['car_id']
+        sql1 = "SELECT a.model_id, a.brand, seat, b.coordinate FROM vehicle a, hub b WHERE a.car_id='{}' and a.hub_id=b.hub_id".format(car_id)
+        result1 = db.session.execute(sql1)
+        dataframe1 = pd.DataFrame(result1)
+        dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
+    return dataframe1_json
+
 if __name__ == '__main__':
     app.run(debug=True)
