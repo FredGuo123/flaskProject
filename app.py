@@ -40,7 +40,7 @@ def register():
             result1 = db.session.execute(sql1).fetchall()
             dataframe = pd.DataFrame(result1)
             cus_id_num = dataframe.at[0, 'COUNT(*)']
-            cus_id = 'GLA' + str(cus_id_num)
+            cus_id = 'GLA' + str(cus_id_num+1)
 
             if email!=None and password1!=None and password2!=None:
                 if password1 == password2:
@@ -338,6 +338,8 @@ def user_cardetails():
         dataframe1 = pd.DataFrame(result1)
         dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
         return dataframe1_json
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
