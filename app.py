@@ -315,5 +315,18 @@ def repaired():
         db.session.commit()
     return "Success!"
 
+@app.route('/user-pay/', methods=['POST'])
+def user_pay():
+    if request.method == 'POST':
+        json = request.get_json()
+        car_id = json['car_id']
+        from_timestamp = json['from_timestamp']
+        to_timestamp = json['to_timestamp']
+        sql1 = "SELECT a.model_id, a.brand, b.total_price FROM vehicle a, transaction b WHERE a.car_id='{}' and a.car_id=b.car_id and b.from_timestamp='{}' and b.to_timestamp".format(car_id, from_timestamp, to_timestamp)
+        result1 = db.session.execute(sql1)
+        dataframe1 = pd.DataFrame(result1)
+        dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
+        return dataframe1_json
+
 if __name__ == '__main__':
     app.run(debug=True)
