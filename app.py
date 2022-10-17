@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 import pymysql
 import pandas as pd
 from datetime import datetime
+import gpsd
+from math import radians, cos, sin, asin, sqrt
 pymysql.install_as_MySQLdb()
 
 
@@ -185,7 +187,20 @@ def user_profileediting():
 
     return 'Finish!'
 
+@app.route('/user-reportdefective/',methods=['GET', 'POST'])
+def user_reportdefective():
+    if request.method == 'POST':
+        json = request.get_json()
+        car_id = json['car_id']
+        brand = json['brand']
+        hub_id = json['hub_id']
+        problem = json['problem']
+        comments = json['comments']
+        sql1 = "UPDATE vehicle SET status=REPLACE(status, {}, {}) where car_id ='{}'" .format(0, 2, car_id)
+        db.session.execute(sql1)
+        db.session.commit()
 
+    return "Success!"
 
 if __name__ == '__main__':
     app.run(debug=True)
