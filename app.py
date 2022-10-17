@@ -285,5 +285,14 @@ def deliver_cars_to_hub():
 
     return "Finish!"
 
+@app.route('/operator-repairlist/', methods=['GET'])
+def operator_repairlist():
+    if request.method == 'GET':
+        sql1 = "SELECT car_id, model_id, brand, seat, hub_id FROM vehicle WHERE status=2"
+        result1 = db.session.execute(sql1)
+        dataframe1 = pd.DataFrame(result1)
+        dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
+    return dataframe1_json
+
 if __name__ == '__main__':
     app.run(debug=True)
