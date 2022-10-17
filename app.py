@@ -202,5 +202,43 @@ def user_reportdefective():
 
     return "Success!"
 
+@app.route('/user-return/',methods=['GET', 'POST'])
+def user_return():
+    if request.method == 'POST':
+        json = request.get_json()
+        car_id = json['car_id']
+
+        sql1 = "SELECT COUNT(*) FROM transaction"
+        result1 = db.session.execute(sql1).fetchall()
+        dataframe1 = pd.DataFrame(result1)
+        tn_id_num = dataframe1.at[0, 'COUNT(*)']
+        tn_id = 'GLA' + str(tn_id_num+1)
+
+        sql2 = "SELECT hub_id FROM vehicle WHERE car_id='{}'".format(car_id)
+        result2 = db.session.execute(sql2).fetchall()
+        dataframe2 = pd.DataFrame(result2)
+        from_hub_id = dataframe2.at[0, 'hub_id']
+
+        to_hub_id = json['to_hub_id']
+        cus_id = json['cus_id']
+        from_timestamp = json['from_timestamp']
+        to_timestamp = json['to_timestamp']
+        total_price = json['total_price']
+        sql3 = "INSERT INTO transaction(tn_id, from_hub_id, to_hub_id, cus_id, from_timestamp, to_timestamp, car_id, total_price) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {})".format(tn_id, from_hub_id, to_hub_id, cus_id, from_timestamp, to_timestamp, car_id, total_price)
+        db.session.execute(sql3)
+        db.session.commit()
+
+        sql4 = "UPDATE vehicle SET status=REPLACE(status, {}, {}) where car_id ='{}'".format(0, 1, car_id)
+        db.session.execute(sql4)
+        db.session.commit()
+
+        sql5 = "UPDATE vehicle SET hub_id=REPLACE(hub_id, '{}', '{}') where car_id ='{}'".format(from_hub_id, to_hub_id, car_id)
+        db.session.execute(sql5)
+        db.session.commit()
+
+
+        return "Finish"
+
+
 if __name__ == '__main__':
     app.run(debug=True)
