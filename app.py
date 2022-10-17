@@ -263,6 +263,27 @@ def operator_movevehicles():
         dataframe1_json = dataframe1.to_json(orient="index", force_ascii=False)
     return dataframe1_json
 
+@app.route('/operator-movevehicles/deliver-cars-to-hub/', methods=['GET', 'POST'])
+def deliver_cars_to_hub():
+    if request.method =='POST':
+        json = request.get_json()
+        hub_name = json['hub_name']
+        car_id = json['car_id']
+        sql1 = "SELECT hub_id FROM hub WHERE hub_name='{}'".format(hub_name)
+        result1 = db.session.execute(sql1)
+        dataframe1 = pd.DataFrame(result1)
+        hub_id = dataframe1.at[0, 'hub_id']
+
+        sql2 = "SELECT hub_id FROM vehicle WHERE car_id='{}'".format(car_id)
+        result2 = db.session.execute(sql2).fetchall()
+        dataframe2 = pd.DataFrame(result2)
+        from_hub_id = dataframe2.at[0, 'hub_id']
+
+        sql3 = "UPDATE vehicle SET hub_id=REPLACE(hub_id, '{}', '{}') where car_id ='{}'".format(from_hub_id, hub_id, car_id)
+        db.session.execute(sql3)
+        db.session.commit()
+
+    return "Finish!"
 
 if __name__ == '__main__':
     app.run(debug=True)
