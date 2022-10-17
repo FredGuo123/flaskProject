@@ -6,6 +6,7 @@ import pymysql
 import pandas as pd
 from datetime import datetime
 import gpsd
+import datetime
 from math import radians, cos, sin, asin, sqrt
 pymysql.install_as_MySQLdb()
 
@@ -223,7 +224,19 @@ def user_return():
         cus_id = json['cus_id']
         from_timestamp = json['from_timestamp']
         to_timestamp = json['to_timestamp']
-        total_price = json['total_price']
+
+        from_timestamp_date = datetime.datetime.strptime(from_timestamp, '%Y-%m-%d %H:%M')
+        to_timestamp_date = datetime.datetime.strptime(to_timestamp, '%Y-%m-%d %H:%M')
+        duration = to_timestamp_date-from_timestamp_date
+        day = duration.days
+        hour = duration.seconds / 3600
+        total_hour = day*24+hour
+        sql6 = "SELECT price FROM vehicle WHERE car_id='{}'".format(car_id)
+        result6 = db.session.execute(sql6).fetchall()
+        dataframe6 = pd.DataFrame(result6)
+        car_price = dataframe6.at[0, 'price']
+        total_price = total_hour*car_price
+
         sql3 = "INSERT INTO transaction(tn_id, from_hub_id, to_hub_id, cus_id, from_timestamp, to_timestamp, car_id, total_price) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {})".format(tn_id, from_hub_id, to_hub_id, cus_id, from_timestamp, to_timestamp, car_id, total_price)
         db.session.execute(sql3)
         db.session.commit()
@@ -238,6 +251,9 @@ def user_return():
 
 
         return "Finish"
+
+# @app.route('/user-return/', methods=['GET', 'POST'])
+
 
 
 if __name__ == '__main__':
