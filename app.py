@@ -249,6 +249,15 @@ def user_return():
         db.session.execute(sql5)
         db.session.commit()
 
+        sql7 = "SELECT amount_due FROM customer WHERE cus_id='{}'".format(cus_id)
+        result7 = db.session.execute(sql7).fetchall()
+        dataframe7 = pd.DataFrame(result7)
+        amount_due_now = dataframe7.at[0, 'amount_due']
+        amount_due = amount_due_now+total_price
+
+        sql8 = "UPDATE customer SET amount_due=REPLACE(amount_due, {}, {}) where cus_id ='{}'".format(amount_due_now, amount_due, cus_id)
+        db.session.execute(sql8)
+        db.session.commit()
 
         return "Finish"
 
